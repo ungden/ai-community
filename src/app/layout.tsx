@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/Toast";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alexle.ai'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'https://alexle.ai')
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
