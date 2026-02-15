@@ -4,19 +4,22 @@
 -- Drop the admin-only policy for posts if it exists
 DROP POLICY IF EXISTS "Admins can manage posts" ON posts;
 
--- Create policy for users to create their own posts
+-- Drop existing policies that overlap (from 001)
+DROP POLICY IF EXISTS "Users can create posts" ON posts;
+DROP POLICY IF EXISTS "Users can create own posts" ON posts;
 CREATE POLICY "Users can create own posts" ON posts
   FOR INSERT WITH CHECK (auth.uid() = author_id);
 
--- Create policy for users to update their own posts
+DROP POLICY IF EXISTS "Users can update own posts" ON posts;
 CREATE POLICY "Users can update own posts" ON posts
   FOR UPDATE USING (auth.uid() = author_id);
 
--- Create policy for users to delete their own posts
+DROP POLICY IF EXISTS "Users can delete own posts" ON posts;
 CREATE POLICY "Users can delete own posts" ON posts
   FOR DELETE USING (auth.uid() = author_id);
 
 -- Admins can still manage all posts
+DROP POLICY IF EXISTS "Admins can manage all posts" ON posts;
 CREATE POLICY "Admins can manage all posts" ON posts
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')

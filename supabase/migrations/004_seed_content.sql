@@ -50,11 +50,13 @@ CREATE TABLE IF NOT EXISTS tools (
 -- Enable RLS
 ALTER TABLE tools ENABLE ROW LEVEL SECURITY;
 
--- Everyone can view tools
+-- Everyone can view tools (drop first to avoid duplicate)
+DROP POLICY IF EXISTS "Tools are viewable by everyone" ON tools;
 CREATE POLICY "Tools are viewable by everyone" ON tools
   FOR SELECT USING (true);
 
--- Only admins can manage tools
+-- Only admins can manage tools (drop first to avoid duplicate)
+DROP POLICY IF EXISTS "Admins can manage tools" ON tools;
 CREATE POLICY "Admins can manage tools" ON tools
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')

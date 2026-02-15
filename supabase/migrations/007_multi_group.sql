@@ -4,15 +4,16 @@
 -- Links posts, courses, events to groups
 -- =====================================================
 
--- Create group privacy type
-CREATE TYPE group_privacy AS ENUM ('public', 'private');
-CREATE TYPE group_member_role AS ENUM ('owner', 'admin', 'moderator', 'member');
+-- Create enum types safely (avoid error if already exists)
+DO $$ BEGIN CREATE TYPE subscription_tier AS ENUM ('free', 'basic', 'premium'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE group_privacy AS ENUM ('public', 'private'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE group_member_role AS ENUM ('owner', 'admin', 'moderator', 'member'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- =====================================================
 -- GROUPS TABLE
 -- =====================================================
-CREATE TABLE groups (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS groups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
@@ -34,7 +35,7 @@ CREATE TABLE groups (
 -- =====================================================
 -- GROUP MEMBERS TABLE
 -- =====================================================
-CREATE TABLE group_members (
+CREATE TABLE IF NOT EXISTS group_members (
   group_id UUID REFERENCES groups(id) ON DELETE CASCADE,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   role group_member_role DEFAULT 'member',
@@ -46,27 +47,27 @@ CREATE TABLE group_members (
 -- =====================================================
 -- ADD group_id TO EXISTING TABLES
 -- =====================================================
-ALTER TABLE posts ADD COLUMN group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
-ALTER TABLE courses ADD COLUMN group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
-ALTER TABLE events ADD COLUMN group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS group_id UUID REFERENCES groups(id) ON DELETE CASCADE;
 
 -- =====================================================
 -- INDEXES
 -- =====================================================
-CREATE INDEX idx_groups_slug ON groups(slug);
-CREATE INDEX idx_groups_owner ON groups(owner_id);
-CREATE INDEX idx_groups_featured ON groups(is_featured) WHERE is_featured = true;
-CREATE INDEX idx_groups_privacy ON groups(privacy);
-CREATE INDEX idx_groups_created ON groups(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_groups_slug ON groups(slug);
+CREATE INDEX IF NOT EXISTS idx_groups_owner ON groups(owner_id);
+CREATE INDEX IF NOT EXISTS idx_groups_featured ON groups(is_featured) WHERE is_featured = true;
+CREATE INDEX IF NOT EXISTS idx_groups_privacy ON groups(privacy);
+CREATE INDEX IF NOT EXISTS idx_groups_created ON groups(created_at DESC);
 
-CREATE INDEX idx_group_members_user ON group_members(user_id);
-CREATE INDEX idx_group_members_group ON group_members(group_id);
-CREATE INDEX idx_group_members_role ON group_members(group_id, role);
-CREATE INDEX idx_group_members_points ON group_members(group_id, points_in_group DESC);
+CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members(group_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_role ON group_members(group_id, role);
+CREATE INDEX IF NOT EXISTS idx_group_members_points ON group_members(group_id, points_in_group DESC);
 
-CREATE INDEX idx_posts_group ON posts(group_id);
-CREATE INDEX idx_courses_group ON courses(group_id);
-CREATE INDEX idx_events_group ON events(group_id);
+CREATE INDEX IF NOT EXISTS idx_posts_group ON posts(group_id);
+CREATE INDEX IF NOT EXISTS idx_courses_group ON courses(group_id);
+CREATE INDEX IF NOT EXISTS idx_events_group ON events(group_id);
 
 -- =====================================================
 -- TRIGGERS: Auto-update member_count
@@ -132,10 +133,12 @@ ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
 
 -- Groups: public groups visible to everyone
+DROP POLICY IF EXISTS "Public groups are viewable by everyone" ON groups;
 CREATE POLICY "Public groups are viewable by everyone" ON groups
   FOR SELECT USING (privacy = 'public');
 
 -- Groups: members can see private groups they belong to
+DROP POLICY IF EXISTS "Members can view their private groups" ON groups;
 CREATE POLICY "Members can view their private groups" ON groups
   FOR SELECT USING (
     privacy = 'private' AND EXISTS (
@@ -144,23 +147,28 @@ CREATE POLICY "Members can view their private groups" ON groups
   );
 
 -- Groups: admins can manage all groups
+DROP POLICY IF EXISTS "Admins can manage groups" ON groups;
 CREATE POLICY "Admins can manage groups" ON groups
   FOR ALL USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
 -- Group members: viewable by everyone (for public groups)
+DROP POLICY IF EXISTS "Group members are viewable" ON group_members;
 CREATE POLICY "Group members are viewable" ON group_members
   FOR SELECT USING (true);
 
 -- Group members: users can join/leave
+DROP POLICY IF EXISTS "Users can join groups" ON group_members;
 CREATE POLICY "Users can join groups" ON group_members
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can leave groups" ON group_members;
 CREATE POLICY "Users can leave groups" ON group_members
   FOR DELETE USING (auth.uid() = user_id);
 
 -- Group members: group admins can manage members
+DROP POLICY IF EXISTS "Group admins can manage members" ON group_members;
 CREATE POLICY "Group admins can manage members" ON group_members
   FOR ALL USING (
     EXISTS (
@@ -186,10 +194,11 @@ SELECT
   'Cộng đồng học AI cho người đi làm. Chia sẻ case study thực tế về ChatGPT, Claude, Midjourney, Make và các AI tools khác. Từ người mới đến chuyên gia, tất cả đều được chào đón!',
   '🚀',
   '#1877f2',
-  'public',
+  'public'::group_privacy,
   id,
   true
-FROM profiles WHERE role = 'admin' LIMIT 1;
+FROM profiles WHERE role = 'admin' LIMIT 1
+ON CONFLICT (slug) DO NOTHING;
 
 -- Migrate existing posts to default group
 UPDATE posts SET group_id = (SELECT id FROM groups WHERE slug = 'alex-le-ai' LIMIT 1)
