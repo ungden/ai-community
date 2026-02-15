@@ -59,7 +59,7 @@ export default function CoursesClient({ user, profile, categories, initialCourse
     if (hours > 0) {
       return `${hours}h ${mins}m`
     }
-    return `${mins} phut`
+    return `${mins} phút`
   }
 
   return (
@@ -76,11 +76,11 @@ export default function CoursesClient({ user, profile, categories, initialCourse
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1877f2] to-[#1664d9] flex items-center justify-center">
                   <Brain className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-[var(--text-primary)] hidden sm:block">
-                  AI Community
+                  Alex Le AI
                 </span>
               </Link>
             </div>

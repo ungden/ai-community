@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, Group } from '@/lib/database.types'
+import { getUserLevel, getEmojiAvatar, EMOJI_AVATARS } from '@/lib/gamification'
 
 interface GroupLayoutProps {
   children: React.ReactNode
@@ -36,8 +37,6 @@ interface GroupLayoutProps {
   topMembers: any[]
   slug: string
 }
-
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
 
 export default function GroupLayout({
   children,
@@ -89,24 +88,6 @@ export default function GroupLayout({
     } finally {
       setIsJoining(false)
     }
-  }
-
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return 9
-    if (points >= 8015) return 8
-    if (points >= 2015) return 7
-    if (points >= 515) return 6
-    if (points >= 155) return 5
-    if (points >= 65) return 4
-    if (points >= 20) return 3
-    if (points >= 5) return 2
-    return 1
-  }
-
-  const getEmojiAvatar = (name: string | null | undefined) => {
-    if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
   }
 
   const userLevel = profile ? getUserLevel(profile.points) : 1
@@ -458,7 +439,7 @@ export default function GroupLayout({
                               {member.full_name || 'Thành viên'}
                             </p>
                             <p className="text-xs text-gray-500">
-                              Lv.{getUserLevel(member.points_in_group || member.points || 0)} &bull; {(member.points_in_group || member.points || 0).toLocaleString()} pts
+                              Lv.{getUserLevel(member.points_in_group || member.points || 0)} &bull; {(member.points_in_group || member.points || 0).toLocaleString()} điểm
                             </p>
                           </div>
                         </Link>

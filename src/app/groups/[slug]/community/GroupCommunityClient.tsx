@@ -19,6 +19,7 @@ import {
   Share2
 } from 'lucide-react'
 import type { Profile, Category, PostWithAuthor } from '@/lib/database.types'
+import { getUserLevel, getLevelName, getEmojiAvatar, EMOJI_AVATARS } from '@/lib/gamification'
 
 interface GroupCommunityClientProps {
   profile: Profile | null
@@ -42,8 +43,6 @@ interface CommentType {
   }
   replies?: CommentType[]
 }
-
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
 
 export default function GroupCommunityClient({
   profile,
@@ -92,29 +91,6 @@ export default function GroupCommunityClient({
     if (days === 1) return 'Hôm qua'
     if (days < 7) return `${days} ngày trước`
     return d.toLocaleDateString('vi-VN')
-  }
-
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return 9
-    if (points >= 8015) return 8
-    if (points >= 2015) return 7
-    if (points >= 515) return 6
-    if (points >= 155) return 5
-    if (points >= 65) return 4
-    if (points >= 20) return 3
-    if (points >= 5) return 2
-    return 1
-  }
-
-  const getLevelName = (level: number) => {
-    const names = ['', 'Người mới', 'Thành viên', 'Tích cực', 'Cộng tác viên', 'Chuyên gia', 'Cao cấp', 'Bậc thầy', 'Huyền thoại', 'Siêu sao']
-    return names[level] || ''
-  }
-
-  const getEmojiAvatar = (name: string | null | undefined) => {
-    if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
   }
 
   const handleCreatePost = async () => {

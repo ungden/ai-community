@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import type { Profile, Badge } from '@/lib/database.types'
+import { getUserLevel, getLevelName, getEmojiAvatar, EMOJI_AVATARS } from '@/lib/gamification'
 
 interface UserBadge {
   badge_id: string
@@ -41,37 +42,11 @@ interface UserProfileClientProps {
   isOwnProfile: boolean
 }
 
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '🧑‍🔬', '👨‍🏫', '👩‍💻', '🧑‍🚀', '👨‍🎓', '👩‍🔧', '🧑‍🎤']
-
-function getEmojiAvatar(name: string): string {
-  const charCode = name ? name.charCodeAt(0) : 0
-  return EMOJI_AVATARS[charCode % EMOJI_AVATARS.length]
-}
-
-function getUserLevel(points: number) {
-  const levels = [
-    { name: 'Người mới', min: 0, level: 1 },
-    { name: 'Học viên', min: 50, level: 2 },
-    { name: 'Thành viên', min: 200, level: 3 },
-    { name: 'Đóng góp', min: 500, level: 4 },
-    { name: 'Chuyên gia', min: 1200, level: 5 },
-    { name: 'Mentor', min: 2800, level: 6 },
-    { name: 'Leader', min: 6000, level: 7 },
-    { name: 'Master', min: 13000, level: 8 },
-    { name: 'Siêu sao', min: 33015, level: 9 },
-  ]
-  let current = levels[0]
-  for (const level of levels) {
-    if (points >= level.min) current = level
-    else break
-  }
-  return current
-}
-
 export default function UserProfileClient({ profile, badges, recentPosts, isOwnProfile }: UserProfileClientProps) {
   const router = useRouter()
   const { theme, toggleTheme } = useTheme()
   const level = getUserLevel(profile.points)
+  const levelName = getLevelName(level)
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('vi-VN', {
@@ -154,7 +129,7 @@ export default function UserProfileClient({ profile, badges, recentPosts, isOwnP
                     <span>điểm</span>
                   </div>
                   <div className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-medium">
-                    Lv.{level.level} {level.name}
+                    Lv.{level} {levelName}
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
                     <Calendar className="w-4 h-4" />

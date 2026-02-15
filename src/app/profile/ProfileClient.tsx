@@ -23,6 +23,7 @@ import { useTheme } from '@/components/ThemeProvider'
 import { vi } from '@/lib/translations'
 import type { User } from '@supabase/supabase-js'
 import type { Profile, Badge, Subscription } from '@/lib/database.types'
+import { getUserLevel, getLevelName } from '@/lib/gamification'
 
 interface UserBadge {
   badge_id: string
@@ -68,19 +69,15 @@ export default function ProfileClient({ user, profile, badges, activeSubscriptio
     }
   }
 
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return { level: 9, name: 'Siêu sao', nextPoints: null }
-    if (points >= 8015) return { level: 8, name: 'Huyền thoại', nextPoints: 33015 }
-    if (points >= 2015) return { level: 7, name: 'Bậc thầy', nextPoints: 8015 }
-    if (points >= 515) return { level: 6, name: 'Chuyên gia cao cấp', nextPoints: 2015 }
-    if (points >= 155) return { level: 5, name: 'Chuyên gia', nextPoints: 515 }
-    if (points >= 65) return { level: 4, name: 'Cộng tác viên', nextPoints: 155 }
-    if (points >= 20) return { level: 3, name: 'Thành viên tích cực', nextPoints: 65 }
-    if (points >= 5) return { level: 2, name: 'Thành viên', nextPoints: 20 }
-    return { level: 1, name: 'Người mới', nextPoints: 5 }
+  const getProfileLevelInfo = (points: number) => {
+    const level = getUserLevel(points)
+    const name = getLevelName(level)
+    const nextThresholds: Record<number, number> = { 1: 5, 2: 20, 3: 65, 4: 155, 5: 515, 6: 2015, 7: 8015, 8: 33015 }
+    const nextPoints = nextThresholds[level] || null
+    return { level, name, nextPoints }
   }
 
-  const userLevelInfo = getUserLevel(profile?.points || 0)
+  const userLevelInfo = getProfileLevelInfo(profile?.points || 0)
   const progressToNext = userLevelInfo.nextPoints 
     ? Math.min(((profile?.points || 0) / userLevelInfo.nextPoints) * 100, 100)
     : 100
@@ -187,7 +184,10 @@ export default function ProfileClient({ user, profile, badges, activeSubscriptio
                 </div>
               </div>
             </div>
-            <button className="px-4 py-2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-primary)] transition-colors flex items-center gap-2">
+            <button 
+              onClick={() => alert('Tính năng đang phát triển')}
+              className="px-4 py-2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-primary)] transition-colors flex items-center gap-2"
+            >
               <Edit className="w-4 h-4" />
               {vi.profile.editProfile}
             </button>
@@ -296,7 +296,7 @@ export default function ProfileClient({ user, profile, badges, activeSubscriptio
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4"
+          className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4"
         >
           <Link
             href="/community"

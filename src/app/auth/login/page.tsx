@@ -121,7 +121,7 @@ export default function LoginPage() {
             <button
               onClick={handleFacebookLogin}
               disabled={loading !== null}
-              className="w-full py-3 px-4 bg-[#1877f2] rounded-xl font-medium text-white hover:bg-[#166fe5] transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-[#1877f2] rounded-xl font-medium text-white hover:bg-[#1664d9] transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {loading === 'facebook' ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

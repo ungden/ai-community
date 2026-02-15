@@ -166,11 +166,11 @@ export function PageLoader() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex flex-col items-center gap-4"
             >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1877f2] to-[#1664d9] flex items-center justify-center">
                     <span className="text-white font-bold text-2xl">C</span>
                 </div>
                 <Spinner size="md" />
-                <p className="text-[var(--text-secondary)]">Loading...</p>
+                <p className="text-[var(--text-secondary)]">Đang tải...</p>
             </motion.div>
         </div>
     );

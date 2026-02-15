@@ -15,6 +15,7 @@ import {
   Loader2
 } from 'lucide-react'
 import MainLayout from '@/components/MainLayout'
+import { useToast } from '@/components/Toast'
 import type { User } from '@supabase/supabase-js'
 import type { Profile, EventWithHost } from '@/lib/database.types'
 
@@ -30,6 +31,7 @@ interface CalendarClientProps {
 
 export default function CalendarClient({ user, profile, initialEvents = [] }: CalendarClientProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [events, setEvents] = useState(initialEvents)
   const [registering, setRegistering] = useState<string | null>(null)
@@ -116,7 +118,7 @@ export default function CalendarClient({ user, profile, initialEvents = [] }: Ca
         }
       }
     } catch {
-      // Error handled silently - registration update failed
+      showToast('Không thể đăng ký sự kiện. Vui lòng thử lại.', 'error')
     } finally {
       setRegistering(null)
     }

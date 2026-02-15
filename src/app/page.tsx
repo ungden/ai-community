@@ -10,12 +10,12 @@ export default async function HomePage() {
     return (
       <LandingPage 
         user={null} 
-        memberCount={1247} 
-        postCount={892} 
-        courseCount={15}
+        memberCount={0} 
+        postCount={0} 
+        courseCount={0}
         posts={FALLBACK_POSTS as any}
         topMembers={FALLBACK_TOP_MEMBERS}
-        onlineCount={23}
+        onlineCount={0}
       />
     )
   }
@@ -58,11 +58,11 @@ export default async function HomePage() {
       .limit(5)
   ])
 
-  // Calculate realistic online count (2-5% of members)
+  // Calculate deterministic online count (fixed 3% of members)
   const memberCount = membersResult.count || 0
   const onlineCount = memberCount > 0 
-    ? Math.max(5, Math.floor(memberCount * (0.02 + Math.random() * 0.03)))
-    : 23
+    ? Math.max(1, Math.floor(memberCount * 0.03))
+    : 0
 
   // Use fallback data if DB is empty
   const posts = recentPosts.data && recentPosts.data.length > 0 
@@ -76,7 +76,7 @@ export default async function HomePage() {
   return (
     <LandingPage 
       user={null}
-      memberCount={membersResult.count || 1247}
+      memberCount={membersResult.count || 0}
       postCount={postsResult.count || 892}
       courseCount={coursesResult.count || 15}
       posts={posts as any}

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile, SubscriptionTier, UserRole } from '@/lib/database.types'
+import { getUserLevel } from '@/lib/gamification'
 
 interface UsersManagementProps {
   initialUsers: Profile[]
@@ -89,18 +90,6 @@ export default function UsersManagement({ initialUsers, totalCount }: UsersManag
       month: '2-digit',
       year: 'numeric',
     })
-  }
-
-  const getLevelFromPoints = (points: number): number => {
-    if (points >= 10000) return 9
-    if (points >= 5000) return 8
-    if (points >= 2500) return 7
-    if (points >= 1200) return 6
-    if (points >= 600) return 5
-    if (points >= 300) return 4
-    if (points >= 100) return 3
-    if (points >= 30) return 2
-    return 1
   }
 
   return (
@@ -202,7 +191,7 @@ export default function UsersManagement({ initialUsers, totalCount }: UsersManag
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                        Lv.{getLevelFromPoints(user.points)}
+                        Lv.{getUserLevel(user.points)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -266,7 +255,7 @@ export default function UsersManagement({ initialUsers, totalCount }: UsersManag
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">{editingUser.full_name || 'Chưa đặt tên'}</p>
-                  <p className="text-sm text-gray-500">{editingUser.points.toLocaleString()} points</p>
+                  <p className="text-sm text-gray-500">{editingUser.points.toLocaleString()} điểm</p>
                 </div>
               </div>
 

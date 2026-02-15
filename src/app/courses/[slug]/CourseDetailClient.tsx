@@ -21,6 +21,7 @@ import {
 import { useTheme } from '@/components/ThemeProvider'
 import type { User } from '@supabase/supabase-js'
 import type { Profile, CourseWithInstructor, SubscriptionTier } from '@/lib/database.types'
+import { getUserLevel, getLevelName } from '@/lib/gamification'
 
 interface CourseDetailClientProps {
   course: CourseWithInstructor
@@ -39,26 +40,6 @@ const TIER_ORDER: Record<SubscriptionTier, number> = {
   free: 0,
   basic: 1,
   premium: 2,
-}
-
-function getUserLevel(points: number) {
-  const levels = [
-    { name: 'Người mới', min: 0 },
-    { name: 'Học viên', min: 50 },
-    { name: 'Thành viên', min: 200 },
-    { name: 'Đóng góp', min: 500 },
-    { name: 'Chuyên gia', min: 1200 },
-    { name: 'Mentor', min: 2800 },
-    { name: 'Leader', min: 6000 },
-    { name: 'Master', min: 13000 },
-    { name: 'Siêu sao', min: 33015 },
-  ]
-  let current = levels[0]
-  for (const level of levels) {
-    if (points >= level.min) current = level
-    else break
-  }
-  return current
 }
 
 export default function CourseDetailClient({ course, lessons, user, profile }: CourseDetailClientProps) {

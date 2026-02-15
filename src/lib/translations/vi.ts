@@ -1,7 +1,7 @@
 export const vi = {
   // Common
   common: {
-    appName: 'AI Community',
+    appName: 'Alex Le AI',
     tagline: 'Cập nhật kiến thức AI mới nhất mỗi ngày',
     search: 'Tìm kiếm...',
     loading: 'Đang tải...',
@@ -82,7 +82,7 @@ export const vi = {
       members: 'thành viên',
     },
     features: {
-      title: 'Tại sao chọn AI Community?',
+      title: 'Tại sao chọn Alex Le AI?',
       subtitle: 'Mọi thứ bạn cần để nắm bắt xu hướng AI',
       posts: {
         title: 'Bài viết chất lượng',
@@ -125,7 +125,7 @@ export const vi = {
       contact: 'Liên hệ',
       terms: 'Điều khoản',
       privacy: 'Bảo mật',
-      copyright: `© ${new Date().getFullYear()} Alex Le AI. All rights reserved.`,
+      copyright: `© ${new Date().getFullYear()} Alex Le AI. Mọi quyền được bảo lưu.`,
     },
   },
 

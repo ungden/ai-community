@@ -3,7 +3,7 @@ import ToolsClient from './ToolsClient'
 import { FALLBACK_TOOLS } from '@/lib/fallback-data'
 
 export const metadata = {
-  title: 'AI Tools Catalogue | Alex Le AI',
+  title: 'Công cụ AI | Alex Le AI',
   description: 'Danh sách các công cụ AI hữu ích: ChatGPT, Claude, Midjourney, Make, và nhiều hơn nữa.',
 }
 

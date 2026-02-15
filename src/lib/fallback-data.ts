@@ -259,9 +259,9 @@ export const FALLBACK_POSTS: Partial<Post>[] = [
   },
   {
     id: '3',
-    title: 'So sánh ChatGPT vs Claude vs Gemini 2024',
+    title: 'So sánh ChatGPT vs Claude vs Gemini',
     slug: 'so-sanh-chatgpt-claude-gemini',
-    content: 'Update tháng 1/2024: So sánh 3 AI chatbot phổ biến nhất...',
+    content: 'So sánh 3 AI chatbot phổ biến nhất...',
     excerpt: 'So sánh chi tiết ChatGPT, Claude và Gemini - ưu nhược điểm của từng tool.',
     category_id: '8',
     required_tier: 'free',
@@ -391,8 +391,8 @@ export const FALLBACK_EVENTS: Partial<Event>[] = [
   },
   {
     id: '3',
-    title: 'Webinar: AI Trends 2024',
-    description: 'Tổng hợp xu hướng AI quan trọng trong 2024 và predictions cho năm tới.',
+    title: 'Webinar: AI Trends',
+    description: 'Tổng hợp xu hướng AI quan trọng và predictions cho năm tới.',
     event_type: 'webinar',
     start_time: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     duration_minutes: 90,

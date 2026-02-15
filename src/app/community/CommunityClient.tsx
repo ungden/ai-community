@@ -8,23 +8,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Heart,
   MessageCircle,
-  Eye,
   Zap,
-  MoreHorizontal,
-  Image as ImageIcon,
   Send,
-  Smile,
   X,
   ChevronDown,
   ChevronUp,
   Loader2,
-  Share2,
-  Pin
+  Share2
 } from 'lucide-react'
 import MainLayout from '@/components/MainLayout'
+import { useToast } from '@/components/Toast'
 import CommunitySidebar from '@/components/CommunitySidebar'
 import type { User } from '@supabase/supabase-js'
 import type { Profile, Category, PostWithAuthor } from '@/lib/database.types'
+import { getUserLevel, getLevelName, getEmojiAvatar, EMOJI_AVATARS } from '@/lib/gamification'
 
 interface CommunityClientProps {
   user: User
@@ -50,8 +47,6 @@ interface CommentType {
   replies?: CommentType[]
 }
 
-// Emoji avatars for visual variety
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
 
 export default function CommunityClient({ 
   user, 
@@ -62,6 +57,7 @@ export default function CommunityClient({
   memberCount
 }: CommunityClientProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [posts, setPosts] = useState(initialPosts)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [newPostContent, setNewPostContent] = useState('')
@@ -75,6 +71,7 @@ export default function CommunityClient({
   const [likedComments, setLikedComments] = useState<Set<string>>(new Set())
   const [likingPost, setLikingPost] = useState<string | null>(null)
   const [likingComment, setLikingComment] = useState<string | null>(null)
+  const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
 
   const filteredPosts = posts.filter(post => {
     if (selectedCategory && post.category_id !== selectedCategory) return false
@@ -104,29 +101,6 @@ export default function CommunityClient({
     return d.toLocaleDateString('vi-VN')
   }
 
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return 9
-    if (points >= 8015) return 8
-    if (points >= 2015) return 7
-    if (points >= 515) return 6
-    if (points >= 155) return 5
-    if (points >= 65) return 4
-    if (points >= 20) return 3
-    if (points >= 5) return 2
-    return 1
-  }
-
-  const getLevelName = (level: number) => {
-    const names = ['', 'Người mới', 'Thành viên', 'Tích cực', 'Cộng tác viên', 'Chuyên gia', 'Cao cấp', 'Bậc thầy', 'Huyền thoại', 'Siêu sao']
-    return names[level] || ''
-  }
-
-  const getEmojiAvatar = (name: string | null | undefined) => {
-    if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
-  }
-
   // Create new post
   const handleCreatePost = async () => {
     if (!newPostContent.trim() || isPosting) return
@@ -148,7 +122,7 @@ export default function CommunityClient({
         setNewPostContent('')
       }
     } catch {
-      // Error handled silently - post creation failed
+      showToast('Không thể tạo bài viết. Vui lòng thử lại.', 'error')
     } finally {
       setIsPosting(false)
     }
@@ -179,7 +153,7 @@ export default function CommunityClient({
         }
       }
     } catch {
-      // Error handled silently - like action failed
+      showToast('Không thể thích bài viết. Vui lòng thử lại.', 'error')
     } finally {
       setLikingPost(null)
     }
@@ -259,7 +233,7 @@ export default function CommunityClient({
         setReplyingTo(null)
       }
     } catch {
-      // Error handled silently - comment creation failed
+      showToast('Không thể gửi bình luận. Vui lòng thử lại.', 'error')
     }
   }
 
@@ -306,7 +280,7 @@ export default function CommunityClient({
         })
       }
     } catch {
-      // Error handled silently - comment like failed
+      showToast('Không thể thích bình luận. Vui lòng thử lại.', 'error')
     } finally {
       setLikingComment(null)
     }
@@ -366,15 +340,7 @@ export default function CommunityClient({
                     placeholder="Chia sẻ điều gì đó với cộng đồng..."
                     className="w-full bg-[#f0f2f5] rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1877f2]/20 resize-none min-h-[80px] text-[15px]"
                   />
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-1">
-                      <button className="p-2 rounded-full hover:bg-[#f0f2f5] text-gray-500 transition-colors" aria-label="Thêm ảnh">
-                        <ImageIcon className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 rounded-full hover:bg-[#f0f2f5] text-gray-500 transition-colors" aria-label="Thêm emoji">
-                        <Smile className="w-5 h-5" />
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-end mt-3">
                     <button 
                       onClick={handleCreatePost}
                       disabled={!newPostContent.trim() || isPosting}
@@ -464,9 +430,7 @@ export default function CommunityClient({
                             )}
                           </div>
                         </div>
-                        <button className="p-2 rounded-full hover:bg-[#f0f2f5] text-gray-500" aria-label="Thêm tùy chọn">
-                          <MoreHorizontal className="w-5 h-5" />
-                        </button>
+
                       </div>
                     </div>
 
@@ -545,9 +509,19 @@ export default function CommunityClient({
                           <ChevronDown className="w-4 h-4" />
                         )}
                       </button>
-                      <button className="flex-1 flex items-center justify-center gap-2 py-2.5 text-gray-600 hover:bg-[#f0f2f5] rounded-lg transition-colors">
+                      <button 
+                        onClick={async () => {
+                          const url = `${window.location.origin}/posts/${post.slug}`
+                          await navigator.clipboard.writeText(url)
+                          setCopiedPostId(post.id)
+                          setTimeout(() => setCopiedPostId(null), 2000)
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 text-gray-600 hover:bg-[#f0f2f5] rounded-lg transition-colors"
+                      >
                         <Share2 className="w-5 h-5" />
-                        <span className="text-sm font-medium">Chia sẻ</span>
+                        <span className="text-sm font-medium">
+                          {copiedPostId === post.id ? 'Đã sao chép liên kết!' : 'Chia sẻ'}
+                        </span>
                       </button>
                     </div>
 

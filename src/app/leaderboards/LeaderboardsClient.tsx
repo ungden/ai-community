@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -13,6 +12,7 @@ import {
 import MainLayout from '@/components/MainLayout'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/database.types'
+import { getUserLevel, getLevelName, getEmojiAvatar, EMOJI_AVATARS, LEVEL_THRESHOLDS } from '@/lib/gamification'
 
 interface LeaderboardsClientProps {
   user: User
@@ -21,61 +21,36 @@ interface LeaderboardsClientProps {
   userRank: number
 }
 
-// Level configuration based on Skool's system
-const LEVELS = [
-  { level: 1, minPoints: 0, name: 'Người mới' },
-  { level: 2, minPoints: 5, name: 'Thành viên' },
-  { level: 3, minPoints: 20, name: 'Tích cực' },
-  { level: 4, minPoints: 65, name: 'Cộng tác viên' },
-  { level: 5, minPoints: 155, name: 'Chuyên gia' },
-  { level: 6, minPoints: 515, name: 'Cao cấp' },
-  { level: 7, minPoints: 2015, name: 'Bậc thầy' },
-  { level: 8, minPoints: 8015, name: 'Huyền thoại' },
-  { level: 9, minPoints: 33015, name: 'Siêu sao' },
-]
-
-// Emoji avatars for visual variety
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
-
 export default function LeaderboardsClient({ user, profile, members, userRank }: LeaderboardsClientProps) {
-  const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all')
 
-  const getUserLevel = (points: number) => {
-    for (let i = LEVELS.length - 1; i >= 0; i--) {
-      if (points >= LEVELS[i].minPoints) {
-        return LEVELS[i]
-      }
-    }
-    return LEVELS[0]
+  const getUserLevelInfo = (points: number) => {
+    const level = getUserLevel(points)
+    const name = getLevelName(level)
+    const threshold = LEVEL_THRESHOLDS.find(t => t.level === level)
+    return { level, name, minPoints: threshold?.points || 0 }
   }
 
   const getNextLevel = (points: number) => {
-    const currentLevel = getUserLevel(points)
-    const nextLevelIndex = LEVELS.findIndex(l => l.level === currentLevel.level) + 1
-    if (nextLevelIndex < LEVELS.length) {
-      return LEVELS[nextLevelIndex]
+    const level = getUserLevel(points)
+    const nextThreshold = LEVEL_THRESHOLDS.find(t => t.level === level + 1)
+    if (nextThreshold) {
+      return { level: nextThreshold.level, name: getLevelName(nextThreshold.level), minPoints: nextThreshold.points }
     }
     return null
   }
 
   const getProgressToNextLevel = (points: number) => {
-    const currentLevel = getUserLevel(points)
+    const currentInfo = getUserLevelInfo(points)
     const nextLevel = getNextLevel(points)
     if (!nextLevel) return 100
     
-    const pointsInCurrentLevel = points - currentLevel.minPoints
-    const pointsNeededForNextLevel = nextLevel.minPoints - currentLevel.minPoints
+    const pointsInCurrentLevel = points - currentInfo.minPoints
+    const pointsNeededForNextLevel = nextLevel.minPoints - currentInfo.minPoints
     return Math.min((pointsInCurrentLevel / pointsNeededForNextLevel) * 100, 100)
   }
 
-  const getEmojiAvatar = (name: string | null | undefined) => {
-    if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
-  }
-
   const userPoints = profile?.points || 0
-  const userLevelInfo = getUserLevel(userPoints)
+  const userLevelInfo = getUserLevelInfo(userPoints)
   const nextLevelInfo = getNextLevel(userPoints)
   const progressPercent = getProgressToNextLevel(userPoints)
 
@@ -98,39 +73,10 @@ export default function LeaderboardsClient({ user, profile, members, userRank }:
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Leaderboard */}
             <div className="lg:col-span-2 space-y-4">
-              {/* Time Filter */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setTimeFilter('all')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    timeFilter === 'all'
-                      ? 'bg-[#1877f2] text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
-                  }`}
-                >
-                  Tất cả
-                </button>
-                <button
-                  onClick={() => setTimeFilter('month')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    timeFilter === 'month'
-                      ? 'bg-[#1877f2] text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
-                  }`}
-                >
-                  Tháng này
-                </button>
-                <button
-                  onClick={() => setTimeFilter('week')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    timeFilter === 'week'
-                      ? 'bg-[#1877f2] text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
-                  }`}
-                >
-                  Tuần này
-                </button>
-              </div>
+              {/* Heading */}
+              <h2 className="px-4 py-2 rounded-full text-sm font-medium bg-[#1877f2] text-white inline-block">
+                Tất cả
+              </h2>
 
               {/* Top 3 Podium */}
               <motion.div
@@ -187,7 +133,7 @@ export default function LeaderboardsClient({ user, profile, members, userRank }:
               <div className="space-y-2">
                 {members.slice(3).map((member, idx) => {
                   const rank = idx + 4
-                  const memberLevel = getUserLevel(member.points)
+                  const memberLevel = getUserLevelInfo(member.points)
                   const isCurrentUser = member.id === user.id
 
                   return (
@@ -300,27 +246,27 @@ export default function LeaderboardsClient({ user, profile, members, userRank }:
                 </div>
                 
                 <div className="space-y-2">
-                  {LEVELS.map((level) => (
+                  {[...LEVEL_THRESHOLDS].reverse().map((t) => (
                     <div 
-                      key={level.level}
+                      key={t.level}
                       className={`flex items-center justify-between p-2 rounded-lg ${
-                        level.level === userLevelInfo.level ? 'bg-[#1877f2]/10' : ''
+                        t.level === userLevelInfo.level ? 'bg-[#1877f2]/10' : ''
                       }`}
                     >
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                          level.level === userLevelInfo.level 
+                          t.level === userLevelInfo.level 
                             ? 'bg-[#1877f2] text-white' 
                             : 'bg-gray-100 text-gray-600'
                         }`}>
-                          Lv.{level.level}
+                          Lv.{t.level}
                         </span>
-                        <span className={`text-sm ${level.level === userLevelInfo.level ? 'text-[#1877f2] font-medium' : 'text-gray-600'}`}>
-                          {level.name}
+                        <span className={`text-sm ${t.level === userLevelInfo.level ? 'text-[#1877f2] font-medium' : 'text-gray-600'}`}>
+                          {getLevelName(t.level)}
                         </span>
                       </div>
                       <span className="text-xs text-gray-500">
-                        {level.minPoints}+ pts
+                        {t.points}+ điểm
                       </span>
                     </div>
                   ))}

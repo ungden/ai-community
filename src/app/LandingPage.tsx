@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { getUserLevel as getLevelFromPoints, getLevelName, EMOJI_AVATARS as AVATAR_EMOJIS } from '@/lib/gamification'
 import {
   Users,
   MessageSquare,
@@ -16,8 +17,6 @@ import {
   Lock,
   Sparkles,
   Clock,
-  Zap,
-  Star,
   ArrowRight,
   Search,
   ChevronRight
@@ -89,26 +88,8 @@ const tabs: { id: TabId; label: string; icon: typeof MessageSquare }[] = [
   { id: 'leaderboards', label: 'Xếp hạng', icon: Trophy },
 ]
 
-// Avatar emojis based on index for consistent display
-const AVATAR_EMOJIS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '👨‍🎓', '👩‍🔧', '🧑‍🏫', '👨‍⚕️', '👩‍🚀']
 
-// Helper to get level from points
-const getLevelFromPoints = (points: number): number => {
-  if (points >= 10000) return 9
-  if (points >= 5000) return 8
-  if (points >= 2500) return 7
-  if (points >= 1200) return 6
-  if (points >= 600) return 5
-  if (points >= 300) return 4
-  if (points >= 100) return 3
-  if (points >= 30) return 2
-  return 1
-}
 
-const getLevelName = (level: number) => {
-  const names = ['', 'Người mới', 'Học viên', 'Thành viên', 'Tích cực', 'Contributor', 'Expert', 'Master', 'Legend', 'Admin']
-  return names[level] || ''
-}
 
 // Helper to format time ago
 const formatTimeAgo = (dateString: string): string => {
@@ -144,10 +125,23 @@ const SAMPLE_TOOLS = [
   { id: '6', name: 'Perplexity', emoji: '🔍', category: 'Search', pricing: 'Freemium', desc: 'AI search engine thông minh' },
 ]
 
+// Helper to get the next occurrence of a given weekday (0=Sun, 6=Sat)
+const getNextWeekday = (targetDay: number, hour: number, minute: number): string => {
+  const now = new Date()
+  const currentDay = now.getDay()
+  let daysUntil = targetDay - currentDay
+  if (daysUntil <= 0) daysUntil += 7
+  const target = new Date(now)
+  target.setDate(now.getDate() + daysUntil)
+  target.setHours(hour, minute, 0, 0)
+  const dayNames = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']
+  return `${dayNames[target.getDay()]}, ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+}
+
 const SAMPLE_EVENTS = [
-  { id: '1', title: 'Live Q&A: ChatGPT Tips & Tricks', date: 'Thứ 7, 15:00', emoji: '🎙️', type: 'Livestream', attendees: 45 },
-  { id: '2', title: 'Workshop: Build AI Automation', date: 'Chủ nhật, 10:00', emoji: '🛠️', type: 'Workshop', attendees: 28 },
-  { id: '3', title: 'Office Hours với Alex Le', date: 'Thứ 4, 20:00', emoji: '💬', type: 'Q&A', attendees: 15 },
+  { id: '1', title: 'Live Q&A: ChatGPT Tips & Tricks', date: getNextWeekday(6, 15, 0), emoji: '🎙️', type: 'Livestream', attendees: 45 },
+  { id: '2', title: 'Workshop: Build AI Automation', date: getNextWeekday(0, 10, 0), emoji: '🛠️', type: 'Workshop', attendees: 28 },
+  { id: '3', title: 'Office Hours với Alex Le', date: getNextWeekday(3, 20, 0), emoji: '💬', type: 'Q&A', attendees: 15 },
 ]
 
 const DEFAULT_GROUPS: GroupPreview[] = [
@@ -197,7 +191,7 @@ export default function LandingPage({
         const isAdmin = post.author?.role === 'admin'
         const avatar = AVATAR_EMOJIS[index % AVATAR_EMOJIS.length]
         const timeAgo = formatTimeAgo(post.published_at)
-        const estimatedComments = Math.max(1, Math.floor(post.likes * (0.1 + Math.random() * 0.2)))
+        const estimatedComments = Math.max(0, Math.floor(post.likes * 0.15))
         
         return (
           <article key={post.id} className="bg-white rounded-lg shadow-sm">
@@ -330,7 +324,7 @@ export default function LandingPage({
       </div>
       <div className="bg-white rounded-lg shadow-sm p-6 text-center">
         <BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <h3 className="font-semibold text-gray-900 mb-1">Còn {courses - SAMPLE_COURSES.length}+ khóa học khác</h3>
+        <h3 className="font-semibold text-gray-900 mb-1">Còn {Math.max(0, courses - SAMPLE_COURSES.length)}+ khóa học khác</h3>
         <p className="text-sm text-gray-500 mb-4">Đăng ký để truy cập tất cả khóa học miễn phí và premium</p>
         <Link href="/auth/register" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1877f2] hover:bg-[#1664d9] text-white font-semibold rounded-lg transition-colors">
           Học ngay — Miễn phí <ArrowRight className="w-4 h-4" />

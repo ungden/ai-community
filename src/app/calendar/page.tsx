@@ -69,7 +69,7 @@ export default async function CalendarPage() {
     // Use fallback events
     eventsWithCounts = FALLBACK_EVENTS.map(event => ({
       ...event,
-      attendees_count: Math.floor(Math.random() * 50) + 10,
+      attendees_count: 0,
       is_registered: false,
       host: { id: '1', full_name: 'Alex Le', avatar_url: null }
     })) as any

@@ -4,15 +4,10 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Users,
-  Info,
-  Shield,
-  Crown,
-  ChevronRight,
-  Globe,
-  Lock,
   MessageSquare,
   BookOpen
 } from 'lucide-react'
+import { getUserLevel } from '@/lib/gamification'
 import type { Profile } from '@/lib/database.types'
 
 interface CommunitySidebarProps {
@@ -26,14 +21,11 @@ interface CommunitySidebarProps {
   isPrivate?: boolean
 }
 
-// Emoji avatars for visual variety
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
-
 export default function CommunitySidebar({
-  memberCount = 1247,
-  onlineCount = 24,
-  postCount = 892,
-  courseCount = 15,
+  memberCount = 0,
+  onlineCount = 0,
+  postCount = 0,
+  courseCount = 0,
   about = 'Cộng đồng học AI cho người đi làm. Chia sẻ case study thực tế về ChatGPT, Claude, Midjourney, Make và các AI tools khác.',
   rules = [
     'Tôn trọng mọi thành viên',
@@ -45,22 +37,10 @@ export default function CommunitySidebar({
   isPrivate = false
 }: CommunitySidebarProps) {
   
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return 9
-    if (points >= 8015) return 8
-    if (points >= 2015) return 7
-    if (points >= 515) return 6
-    if (points >= 155) return 5
-    if (points >= 65) return 4
-    if (points >= 20) return 3
-    if (points >= 5) return 2
-    return 1
-  }
-
   const getEmojiAvatar = (name: string | null | undefined) => {
     if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
+    const code = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    return ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳'][code % 10]
   }
 
   return (
@@ -103,7 +83,7 @@ export default function CommunitySidebar({
             <h3 className="font-bold text-gray-900">Thành viên nổi bật</h3>
             <span className="text-xs text-green-600 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              {onlineCount} online
+              {onlineCount} trực tuyến
             </span>
           </div>
           <div className="space-y-3">
@@ -128,7 +108,7 @@ export default function CommunitySidebar({
                     {member.full_name || 'Thành viên'}
                   </p>
                   <p className="text-xs text-gray-500">
-                    Lv.{getUserLevel(member.points)} • {member.points.toLocaleString()} pts
+                    Lv.{getUserLevel(member.points)} • {member.points.toLocaleString()} điểm
                   </p>
                 </div>
               </Link>

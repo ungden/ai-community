@@ -18,6 +18,7 @@ import {
   Loader2
 } from 'lucide-react'
 import MainLayout from '@/components/MainLayout'
+import { useToast } from '@/components/Toast'
 import type { User } from '@supabase/supabase-js'
 import type { Profile, Group } from '@/lib/database.types'
 
@@ -39,6 +40,7 @@ export default function GroupsClient({
   memberCount
 }: GroupsClientProps) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [activeTab, setActiveTab] = useState<FilterTab>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [joiningGroup, setJoiningGroup] = useState<string | null>(null)
@@ -88,7 +90,7 @@ export default function GroupsClient({
         }
       }
     } catch {
-      // Error handled silently - join action failed
+      showToast('Không thể tham gia nhóm. Vui lòng thử lại.', 'error')
     } finally {
       setJoiningGroup(null)
     }

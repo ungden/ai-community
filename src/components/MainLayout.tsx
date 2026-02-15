@@ -22,6 +22,7 @@ import {
   Sparkles
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { getUserLevel, getLevelName } from '@/lib/gamification'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/database.types'
 
@@ -39,7 +40,7 @@ const NAV_ITEMS = [
   { href: '/groups', label: 'Nhóm', icon: Users },
   { href: '/community', label: 'Cộng đồng', icon: MessageSquare },
   { href: '/courses', label: 'Khóa học', icon: BookOpen },
-  { href: '/tools', label: 'AI Tools', icon: Sparkles },
+  { href: '/tools', label: 'Công cụ AI', icon: Sparkles },
   { href: '/calendar', label: 'Lịch', icon: Calendar },
   { href: '/leaderboards', label: 'Xếp hạng', icon: Trophy },
 ]
@@ -59,6 +60,13 @@ export default function MainLayout({
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
+  const handleSearch = () => {
+    const trimmed = searchQuery.trim()
+    if (trimmed) {
+      router.push(`/community?search=${encodeURIComponent(trimmed)}`)
+    }
+  }
+
   const handleLogout = async () => {
     const supabase = createClient()
     if (supabase) {
@@ -66,23 +74,6 @@ export default function MainLayout({
     }
     router.push('/auth/login')
     router.refresh()
-  }
-
-  const getUserLevel = (points: number) => {
-    if (points >= 33015) return 9
-    if (points >= 8015) return 8
-    if (points >= 2015) return 7
-    if (points >= 515) return 6
-    if (points >= 155) return 5
-    if (points >= 65) return 4
-    if (points >= 20) return 3
-    if (points >= 5) return 2
-    return 1
-  }
-
-  const getLevelName = (level: number) => {
-    const names = ['', 'Người mới', 'Thành viên', 'Tích cực', 'Cộng tác viên', 'Chuyên gia', 'Cao cấp', 'Bậc thầy', 'Huyền thoại', 'Siêu sao']
-    return names[level] || ''
   }
 
   const userLevel = profile ? getUserLevel(profile.points) : 1
@@ -114,6 +105,8 @@ export default function MainLayout({
                   placeholder="Tìm kiếm trong cộng đồng..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  aria-label="Tìm kiếm"
                   className="w-full pl-10 pr-4 py-2 bg-[#f0f2f5] rounded-full text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1877f2]/20"
                 />
               </div>
@@ -123,7 +116,7 @@ export default function MainLayout({
             <div className="flex items-center gap-2">
               {/* Notifications */}
               {user && (
-                <button className="p-2.5 rounded-full bg-[#f0f2f5] hover:bg-gray-200 transition-colors relative">
+                <button className="p-2.5 rounded-full bg-[#f0f2f5] hover:bg-gray-200 transition-colors relative" aria-label="Thông báo">
                   <Bell className="w-5 h-5 text-gray-700" />
                 </button>
               )}
@@ -134,6 +127,8 @@ export default function MainLayout({
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="flex items-center gap-2 p-1 rounded-full hover:bg-[#f0f2f5] transition-colors"
+                    aria-label="Menu người dùng"
+                    aria-expanded={showUserMenu}
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-lg">
                       {profile?.full_name?.charAt(0) || '👤'}
@@ -221,6 +216,8 @@ export default function MainLayout({
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="md:hidden p-2.5 rounded-full bg-[#f0f2f5] hover:bg-gray-200 transition-colors"
+                aria-label={showMobileMenu ? 'Đóng menu' : 'Mở menu'}
+                aria-expanded={showMobileMenu}
               >
                 {showMobileMenu ? (
                   <X className="w-5 h-5 text-gray-700" />
@@ -249,6 +246,8 @@ export default function MainLayout({
                   placeholder="Tìm kiếm..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  aria-label="Tìm kiếm"
                   className="w-full pl-10 pr-4 py-2.5 bg-[#f0f2f5] rounded-full text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none"
                 />
               </div>
@@ -315,7 +314,7 @@ export default function MainLayout({
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex gap-1 border-t border-gray-200 -mb-px overflow-x-auto">
+                <div className="flex gap-1 border-t border-gray-200 -mb-px overflow-x-auto" role="tablist">
                   {NAV_ITEMS.map((item) => {
                     const isActive = pathname.startsWith(item.href)
                     const Icon = item.icon

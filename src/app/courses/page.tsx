@@ -1,13 +1,18 @@
 import { createClient } from '@/lib/supabase/server'
 import CoursesClient from './CoursesClient'
 
+export const metadata = {
+  title: 'Khóa học | Alex Le AI',
+  description: 'Khóa học AI từ cơ bản đến nâng cao cho người đi làm'
+}
+
 export default async function CoursesPage() {
   const supabase = await createClient()
   
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-500">Service unavailable. Please try again later.</p>
+        <p className="text-gray-500">Hệ thống đang bảo trì. Vui lòng thử lại sau.</p>
       </div>
     )
   }

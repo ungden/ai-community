@@ -32,20 +32,20 @@ interface ToolsClientProps {
 
 const CATEGORIES = [
   { id: 'all', name: 'Tất cả', icon: Sparkles },
-  { id: 'llm', name: 'AI Chatbots', icon: MessageSquare },
-  { id: 'image', name: 'Image Generation', icon: Image },
+  { id: 'llm', name: 'LLM/Chatbot', icon: MessageSquare },
+  { id: 'image', name: 'Tạo hình ảnh', icon: Image },
   { id: 'video', name: 'Video AI', icon: Video },
-  { id: 'audio', name: 'Audio AI', icon: Music },
-  { id: 'automation', name: 'Automation', icon: Zap },
-  { id: 'coding', name: 'Coding', icon: Code },
-  { id: 'writing', name: 'Writing', icon: FileText },
+  { id: 'audio', name: 'Âm thanh AI', icon: Music },
+  { id: 'automation', name: 'Tự động hóa', icon: Zap },
+  { id: 'coding', name: 'Lập trình', icon: Code },
+  { id: 'writing', name: 'Viết nội dung', icon: FileText },
 ]
 
 const PRICING_FILTERS = [
   { id: 'all', name: 'Tất cả' },
-  { id: 'free', name: 'Free' },
+  { id: 'free', name: 'Miễn phí' },
   { id: 'freemium', name: 'Freemium' },
-  { id: 'paid', name: 'Paid' },
+  { id: 'paid', name: 'Trả phí' },
 ]
 
 export default function ToolsClient({ user, profile, tools }: ToolsClientProps) {
@@ -83,11 +83,11 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
   const getPricingBadge = (pricing: string) => {
     switch (pricing) {
       case 'free':
-        return <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Free</span>
+        return <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">Miễn phí</span>
       case 'freemium':
         return <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">Freemium</span>
       case 'paid':
-        return <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Paid</span>
+        return <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">Trả phí</span>
       default:
         return null
     }
@@ -105,7 +105,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-[1100px] mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              AI Tools Catalogue
+              Công cụ AI
             </h1>
             <p className="text-gray-600 text-lg">
               Khám phá {tools.length}+ công cụ AI hữu ích cho công việc và cuộc sống
@@ -121,7 +121,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Tìm kiếm tools..."
+                placeholder="Tìm kiếm công cụ..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-[#f0f2f5] rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1877f2]/20"
@@ -174,7 +174,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
             <div className="mb-8">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-yellow-500" />
-                Tools nổi bật
+                Công cụ nổi bật
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {featuredTools.map((tool, idx) => {
@@ -230,15 +230,17 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
                         </div>
 
                         {/* Action */}
-                        <a
-                          href={tool.website_url || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 bg-[#1877f2] text-white rounded-lg hover:bg-[#1664d9] transition-colors flex-shrink-0"
-                          aria-label={`Mở ${tool.name}`}
-                        >
-                          <ExternalLink className="w-5 h-5" />
-                        </a>
+                        {tool.website_url && (
+                          <a
+                            href={tool.website_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 bg-[#1877f2] text-white rounded-lg hover:bg-[#1664d9] transition-colors flex-shrink-0"
+                            aria-label={`Mở ${tool.name}`}
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                        )}
                       </div>
 
                       {/* Expandable Details */}
@@ -272,7 +274,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
                           {/* Use Cases */}
                           {tool.use_cases && tool.use_cases.length > 0 && (
                             <div>
-                              <h4 className="font-medium text-gray-900 text-sm mb-2">Use Cases</h4>
+                              <h4 className="font-medium text-gray-900 text-sm mb-2">Ứng dụng</h4>
                               <ul className="text-sm text-gray-600 space-y-1">
                                 {tool.use_cases.map((useCase, i) => (
                                   <li key={i} className="flex items-center gap-2">
@@ -324,7 +326,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
           {otherTools.length > 0 && (
             <div>
               <h2 className="text-lg font-bold text-gray-900 mb-4">
-                Tất cả Tools ({otherTools.length})
+                Tất cả công cụ ({otherTools.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {otherTools.map((tool, idx) => {
@@ -359,15 +361,17 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
                         </div>
 
                         {/* Action */}
-                        <a
-                          href={tool.website_url || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 text-gray-400 hover:text-[#1877f2] transition-colors flex-shrink-0"
-                          aria-label={`Mở ${tool.name}`}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
+                        {tool.website_url && (
+                          <a
+                            href={tool.website_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 text-gray-400 hover:text-[#1877f2] transition-colors flex-shrink-0"
+                            aria-label={`Mở ${tool.name}`}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
                       </div>
 
                       {/* Rating */}
@@ -402,7 +406,7 @@ export default function ToolsClient({ user, profile, tools }: ToolsClientProps) 
           {filteredTools.length === 0 && (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
               <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 font-medium">Không tìm thấy tool nào</p>
+              <p className="text-gray-600 font-medium">Không tìm thấy công cụ nào</p>
               <p className="text-sm text-gray-400 mt-1">
                 Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
               </p>

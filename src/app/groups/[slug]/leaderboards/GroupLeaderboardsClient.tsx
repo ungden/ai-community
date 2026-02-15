@@ -7,6 +7,7 @@ import {
   Zap
 } from 'lucide-react'
 import type { Profile } from '@/lib/database.types'
+import { getUserLevel, getLevelName, getEmojiAvatar, EMOJI_AVATARS, LEVEL_THRESHOLDS } from '@/lib/gamification'
 
 interface MemberData {
   id: string
@@ -25,20 +26,6 @@ interface GroupLeaderboardsClientProps {
   groupName: string
 }
 
-const LEVELS = [
-  { level: 1, minPoints: 0, name: 'Người mới' },
-  { level: 2, minPoints: 5, name: 'Thành viên' },
-  { level: 3, minPoints: 20, name: 'Tích cực' },
-  { level: 4, minPoints: 65, name: 'Cộng tác viên' },
-  { level: 5, minPoints: 155, name: 'Chuyên gia' },
-  { level: 6, minPoints: 515, name: 'Cao cấp' },
-  { level: 7, minPoints: 2015, name: 'Bậc thầy' },
-  { level: 8, minPoints: 8015, name: 'Huyền thoại' },
-  { level: 9, minPoints: 33015, name: 'Siêu sao' },
-]
-
-const EMOJI_AVATARS = ['🧑‍💻', '👨‍💼', '👩‍🎨', '👨‍🔬', '👩‍💻', '🧑‍🎓', '👨‍🏫', '👩‍🔧', '🧑‍🚀', '👨‍🍳']
-
 export default function GroupLeaderboardsClient({
   currentUserId,
   profile,
@@ -48,42 +35,34 @@ export default function GroupLeaderboardsClient({
 }: GroupLeaderboardsClientProps) {
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all')
 
-  const getUserLevel = (points: number) => {
-    for (let i = LEVELS.length - 1; i >= 0; i--) {
-      if (points >= LEVELS[i].minPoints) {
-        return LEVELS[i]
-      }
-    }
-    return LEVELS[0]
+  const getUserLevelInfo = (points: number) => {
+    const level = getUserLevel(points)
+    const name = getLevelName(level)
+    const threshold = LEVEL_THRESHOLDS.find(t => t.level === level)
+    return { level, name, minPoints: threshold?.points || 0 }
   }
 
   const getNextLevel = (points: number) => {
-    const currentLevel = getUserLevel(points)
-    const nextLevelIndex = LEVELS.findIndex(l => l.level === currentLevel.level) + 1
-    if (nextLevelIndex < LEVELS.length) {
-      return LEVELS[nextLevelIndex]
+    const level = getUserLevel(points)
+    const nextThreshold = LEVEL_THRESHOLDS.find(t => t.level === level + 1)
+    if (nextThreshold) {
+      return { level: nextThreshold.level, name: getLevelName(nextThreshold.level), minPoints: nextThreshold.points }
     }
     return null
   }
 
   const getProgressToNextLevel = (points: number) => {
-    const currentLevel = getUserLevel(points)
+    const currentInfo = getUserLevelInfo(points)
     const nextLevel = getNextLevel(points)
     if (!nextLevel) return 100
 
-    const pointsInCurrentLevel = points - currentLevel.minPoints
-    const pointsNeededForNextLevel = nextLevel.minPoints - currentLevel.minPoints
+    const pointsInCurrentLevel = points - currentInfo.minPoints
+    const pointsNeededForNextLevel = nextLevel.minPoints - currentInfo.minPoints
     return Math.min((pointsInCurrentLevel / pointsNeededForNextLevel) * 100, 100)
   }
 
-  const getEmojiAvatar = (name: string | null | undefined) => {
-    if (!name) return '👤'
-    const index = name.charCodeAt(0) % EMOJI_AVATARS.length
-    return EMOJI_AVATARS[index]
-  }
-
   const userGroupPoints = members.find(m => m.id === currentUserId)?.points_in_group || 0
-  const userLevelInfo = getUserLevel(userGroupPoints)
+  const userLevelInfo = getUserLevelInfo(userGroupPoints)
   const nextLevelInfo = getNextLevel(userGroupPoints)
   const progressPercent = getProgressToNextLevel(userGroupPoints)
 
@@ -245,7 +224,7 @@ export default function GroupLeaderboardsClient({
       <div className="space-y-2">
         {members.slice(3).map((member, idx) => {
           const rank = idx + 4
-          const memberLevel = getUserLevel(member.points_in_group)
+          const memberLevel = getUserLevelInfo(member.points_in_group)
           const isCurrentUser = member.id === currentUserId
 
           return (

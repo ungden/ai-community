@@ -18,6 +18,12 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { vi } from '@/lib/translations'
+import { useToast } from '@/components/Toast'
+
+const BANK_NAME = process.env.NEXT_PUBLIC_BANK_NAME || ''
+const BANK_ACCOUNT = process.env.NEXT_PUBLIC_BANK_ACCOUNT || ''
+const BANK_ACCOUNT_NAME = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || ''
+const isBankConfigured = !!(BANK_NAME && BANK_ACCOUNT && BANK_ACCOUNT_NAME)
 
 const PLANS = {
   basic: {
@@ -66,6 +72,7 @@ export default function PricingClient() {
   const [checkingPayment, setCheckingPayment] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
+  const { showToast } = useToast()
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -119,11 +126,13 @@ export default function PricingClient() {
         } as never)
 
       if (error) {
+        showToast('Không thể tạo đơn thanh toán. Vui lòng thử lại sau.', 'error')
         return
       }
 
       setShowPayment(true)
     } catch {
+      showToast('Đã xảy ra lỗi. Vui lòng thử lại sau.', 'error')
     } finally {
       setLoading(false)
     }
@@ -166,11 +175,11 @@ export default function PricingClient() {
         }
       }
     } catch {
-      // Payment check failed silently
+      showToast('Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại.', 'error')
     } finally {
       setCheckingPayment(false)
     }
-  }, [paymentRef, user])
+  }, [paymentRef, user, showToast])
 
   // Auto-check payment status every 10 seconds when showing payment
   useEffect(() => {
@@ -289,100 +298,113 @@ export default function PricingClient() {
                   {vi.payment.transferInfo}
                 </h2>
                 
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.bankName}</label>
-                    <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
-                      <span className="font-medium text-[var(--text-primary)]">
-                        {process.env.NEXT_PUBLIC_BANK_NAME || 'MB Bank'}
-                      </span>
+                {isBankConfigured ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.bankName}</label>
+                      <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
+                        <span className="font-medium text-[var(--text-primary)]">
+                          {BANK_NAME}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.accountNumber}</label>
+                      <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
+                        <span className="font-mono font-medium text-[var(--text-primary)]">
+                          {BANK_ACCOUNT}
+                        </span>
+                        <button
+                          onClick={() => handleCopy(BANK_ACCOUNT, 'account')}
+                          className="p-1.5 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
+                        >
+                          {copied === 'account' ? (
+                            <Check className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-[var(--text-tertiary)]" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.accountName}</label>
+                      <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
+                        <span className="font-medium text-[var(--text-primary)]">
+                          {BANK_ACCOUNT_NAME}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.amount}</label>
+                      <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
+                        <span className="font-bold text-[var(--text-primary)]">
+                          {PLANS[selectedPlan].price.toLocaleString('vi-VN')} VND
+                        </span>
+                        <button
+                          onClick={() => handleCopy(PLANS[selectedPlan].price.toString(), 'amount')}
+                          className="p-1.5 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
+                        >
+                          {copied === 'amount' ? (
+                            <Check className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-[var(--text-tertiary)]" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.transferContent}</label>
+                      <div className="flex items-center justify-between mt-1 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                        <span className="font-mono font-bold text-blue-500">
+                          {paymentRef}
+                        </span>
+                        <button
+                          onClick={() => handleCopy(paymentRef, 'ref')}
+                          className="p-1.5 hover:bg-blue-500/20 rounded-lg transition-colors"
+                        >
+                          {copied === 'ref' ? (
+                            <Check className="w-4 h-4 text-green-500" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-blue-500" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-xs text-red-500 mt-1">
+                        * Quan trọng: Nhập đúng nội dung chuyển khoản để hệ thống tự động xác nhận
+                      </p>
                     </div>
                   </div>
-
-                  <div>
-                    <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.accountNumber}</label>
-                    <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
-                      <span className="font-mono font-medium text-[var(--text-primary)]">
-                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT || '0123456789'}
-                      </span>
-                      <button
-                        onClick={() => handleCopy(process.env.NEXT_PUBLIC_BANK_ACCOUNT || '0123456789', 'account')}
-                        className="p-1.5 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
-                      >
-                        {copied === 'account' ? (
-                          <Check className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-[var(--text-tertiary)]" />
-                        )}
-                      </button>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto mb-4">
+                      <Zap className="w-6 h-6 text-yellow-500" />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.accountName}</label>
-                    <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
-                      <span className="font-medium text-[var(--text-primary)]">
-                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || 'NGUYEN VAN A'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.amount}</label>
-                    <div className="flex items-center justify-between mt-1 p-3 bg-[var(--bg-primary)] rounded-xl">
-                      <span className="font-bold text-[var(--text-primary)]">
-                        {PLANS[selectedPlan].price.toLocaleString('vi-VN')} VND
-                      </span>
-                      <button
-                        onClick={() => handleCopy(PLANS[selectedPlan].price.toString(), 'amount')}
-                        className="p-1.5 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
-                      >
-                        {copied === 'amount' ? (
-                          <Check className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-[var(--text-tertiary)]" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm text-[var(--text-tertiary)]">{vi.payment.transferContent}</label>
-                    <div className="flex items-center justify-between mt-1 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                      <span className="font-mono font-bold text-blue-500">
-                        {paymentRef}
-                      </span>
-                      <button
-                        onClick={() => handleCopy(paymentRef, 'ref')}
-                        className="p-1.5 hover:bg-blue-500/20 rounded-lg transition-colors"
-                      >
-                        {copied === 'ref' ? (
-                          <Check className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-xs text-red-500 mt-1">
-                      * Quan trọng: Nhập đúng nội dung chuyển khoản để hệ thống tự động xác nhận
+                    <p className="text-[var(--text-secondary)] font-medium mb-2">
+                      Chưa cấu hình thanh toán
+                    </p>
+                    <p className="text-sm text-[var(--text-tertiary)]">
+                      Vui lòng liên hệ admin để được hướng dẫn thanh toán.
                     </p>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
-            {/* QR Code Section */}
-            <div className="mt-6 bg-[var(--bg-secondary)] rounded-2xl p-6 border border-[var(--border-light)] text-center">
-              <h3 className="font-semibold text-[var(--text-primary)] mb-4">
-                {vi.payment.scanQR}
-              </h3>
-              <div className="w-48 h-48 bg-white rounded-xl mx-auto flex items-center justify-center">
-                <QrCode className="w-32 h-32 text-gray-300" />
+            {/* QR Code Section - only show when bank is configured */}
+            {isBankConfigured && (
+              <div className="mt-6 bg-[var(--bg-secondary)] rounded-2xl p-6 border border-[var(--border-light)] text-center">
+                <h3 className="font-semibold text-[var(--text-primary)] mb-4">
+                  {vi.payment.scanQR}
+                </h3>
+                <div className="w-48 h-48 bg-white rounded-xl mx-auto flex items-center justify-center">
+                  <QrCode className="w-32 h-32 text-gray-300" />
+                </div>
               </div>
-              <p className="text-sm text-[var(--text-tertiary)] mt-4">
-                (QR code sẽ được tạo từ Sepay API)
-              </p>
-            </div>
+            )}
 
             {/* Status Check */}
             <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
@@ -430,7 +452,7 @@ export default function PricingClient() {
                 <Brain className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-[var(--text-primary)]">
-                AI Community
+                Alex Le AI
               </span>
             </Link>
             {user ? (
