@@ -1,0 +1,74 @@
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import type { Database } from '@/lib/database.types'
+
+type CookieToSet = { name: string; value: string; options?: CookieOptions }
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+// Check if Supabase is configured
+export function isSupabaseConfigured(): boolean {
+  return Boolean(supabaseUrl && supabaseAnonKey)
+}
+
+export async function createClient() {
+  // Return null if Supabase is not configured
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null
+  }
+
+  const cookieStore = await cookies()
+
+  return createServerClient<Database>(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet: CookieToSet[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  )
+}
+
+export async function createServiceClient() {
+  // Return null if Supabase is not configured
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return null
+  }
+
+  const cookieStore = await cookies()
+  
+  return createServerClient<Database>(
+    supabaseUrl,
+    supabaseServiceKey,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet: CookieToSet[]) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {}
+        },
+      },
+    }
+  )
+}
