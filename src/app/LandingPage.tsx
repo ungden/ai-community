@@ -114,7 +114,7 @@ export default function LandingPage({ memberCount, postCount, courseCount, onlin
                 initial="hidden"
                 animate="visible"
                 variants={fadeInUp}
-                className="mb-5 text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl"
+                className="mb-6 text-[2rem] font-extrabold leading-[1.15] tracking-tight sm:text-5xl sm:leading-tight md:text-6xl"
               >
                 Học AI đơn giản,
                 <span className="block bg-gradient-to-r from-[#1877f2] to-[#0ea5e9] bg-clip-text text-transparent">
@@ -126,18 +126,18 @@ export default function LandingPage({ memberCount, postCount, courseCount, onlin
                 initial="hidden"
                 animate="visible"
                 variants={fadeInUp}
-                className="mx-auto mb-8 max-w-2xl text-lg text-gray-600 sm:text-xl"
+                className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg md:text-xl"
               >
                 Case study thực tế, cộng đồng chất lượng, và lộ trình học rõ ràng để bạn ứng dụng AI ngay trong công việc mỗi ngày.
               </motion.p>
 
-              <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-8">
+              <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-6 sm:mb-8">
                 <Link
                   href="/auth/register"
-                  className="group inline-flex items-center gap-2 rounded-2xl bg-[#1877f2] px-8 py-4 text-lg font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#1664d9] hover:shadow-xl hover:shadow-blue-200"
+                  className="group inline-flex items-center gap-2 rounded-2xl bg-[#1877f2] px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-200/50 transition-all hover:-translate-y-0.5 hover:bg-[#1664d9] hover:shadow-xl hover:shadow-blue-200 sm:px-8 sm:py-4 sm:text-lg"
                 >
                   Tham gia miễn phí
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 sm:h-5 sm:w-5" />
                 </Link>
               </motion.div>
 
@@ -145,23 +145,23 @@ export default function LandingPage({ memberCount, postCount, courseCount, onlin
                 initial="hidden"
                 animate="visible"
                 variants={fadeInUp}
-                className="mx-auto grid max-w-3xl grid-cols-2 gap-3 text-left sm:grid-cols-4"
+                className="mx-auto grid max-w-3xl grid-cols-2 gap-2.5 text-left sm:grid-cols-4 sm:gap-3"
               >
-                <div className="rounded-xl border border-white bg-white/90 p-4 shadow-sm">
-                  <p className="text-2xl font-extrabold text-[#1877f2]">{members.toLocaleString()}+</p>
-                  <p className="text-sm text-gray-600">Thành viên</p>
+                <div className="rounded-xl border border-white/80 bg-white/90 p-3 shadow-sm sm:p-4">
+                  <p className="text-xl font-extrabold text-[#1877f2] sm:text-2xl">{members.toLocaleString()}+</p>
+                  <p className="text-xs text-gray-600 sm:text-sm">Thành viên</p>
                 </div>
-                <div className="rounded-xl border border-white bg-white/90 p-4 shadow-sm">
-                  <p className="text-2xl font-extrabold text-[#1877f2]">{totalPosts.toLocaleString()}+</p>
-                  <p className="text-sm text-gray-600">Bài viết</p>
+                <div className="rounded-xl border border-white/80 bg-white/90 p-3 shadow-sm sm:p-4">
+                  <p className="text-xl font-extrabold text-[#1877f2] sm:text-2xl">{totalPosts.toLocaleString()}+</p>
+                  <p className="text-xs text-gray-600 sm:text-sm">Bài viết</p>
                 </div>
-                <div className="rounded-xl border border-white bg-white/90 p-4 shadow-sm">
-                  <p className="text-2xl font-extrabold text-[#1877f2]">{courses.toLocaleString()}+</p>
-                  <p className="text-sm text-gray-600">Khóa học</p>
+                <div className="rounded-xl border border-white/80 bg-white/90 p-3 shadow-sm sm:p-4">
+                  <p className="text-xl font-extrabold text-[#1877f2] sm:text-2xl">{courses.toLocaleString()}+</p>
+                  <p className="text-xs text-gray-600 sm:text-sm">Khóa học</p>
                 </div>
-                <div className="rounded-xl border border-white bg-white/90 p-4 shadow-sm">
-                  <p className="text-2xl font-extrabold text-[#1877f2]">{online.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">Đang online</p>
+                <div className="rounded-xl border border-white/80 bg-white/90 p-3 shadow-sm sm:p-4">
+                  <p className="text-xl font-extrabold text-[#1877f2] sm:text-2xl">{online.toLocaleString()}</p>
+                  <p className="text-xs text-gray-600 sm:text-sm">Đang online</p>
                 </div>
               </motion.div>
 
@@ -182,74 +182,74 @@ export default function LandingPage({ memberCount, postCount, courseCount, onlin
           </div>
         </section>
 
-        <section className="bg-gray-50 py-16 md:py-20">
+        <section className="bg-gray-50 py-12 md:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeInUp} className="mb-10 text-center">
-              <h2 className="mb-3 text-3xl font-extrabold md:text-4xl">Đủ gọn để dễ bắt đầu, đủ chất để đi xa</h2>
-              <p className="mx-auto max-w-2xl text-lg text-gray-600">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={fadeInUp} className="mb-8 text-center md:mb-10">
+              <h2 className="mb-2 text-2xl font-extrabold tracking-tight sm:text-3xl md:mb-3 md:text-4xl">Đủ gọn để dễ bắt đầu, đủ chất để đi xa</h2>
+              <p className="mx-auto max-w-2xl text-base text-gray-600 sm:text-lg">
                 Tập trung vào 3 thứ quan trọng nhất để bạn học nhanh và áp dụng AI hiệu quả.
               </p>
             </motion.div>
 
-            <div className="grid gap-5 md:grid-cols-3">
-              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
-                  <Target className="h-6 w-6 text-[#1877f2]" />
+            <div className="grid gap-4 md:grid-cols-3 md:gap-5">
+              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 md:mb-4 md:h-12 md:w-12">
+                  <Target className="h-5 w-5 text-[#1877f2] md:h-6 md:w-6" />
                 </div>
-                <h3 className="mb-2 text-xl font-bold">Học AI thực chiến</h3>
-                <p className="text-gray-600">Case study ngắn gọn, đi thẳng vào cách làm và kết quả thực tế.</p>
-                <p className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#1877f2]">
-                  <TrendingUp className="h-4 w-4" /> {totalPosts}+ chia sẻ thực tế
+                <h3 className="mb-1.5 text-lg font-bold md:mb-2 md:text-xl">Học AI thực chiến</h3>
+                <p className="text-sm text-gray-600 md:text-base">Case study ngắn gọn, đi thẳng vào cách làm và kết quả thực tế.</p>
+                <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-[#1877f2] md:mt-3 md:text-sm">
+                  <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4" /> {totalPosts}+ chia sẻ thực tế
                 </p>
               </motion.article>
 
-              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50">
-                  <Users className="h-6 w-6 text-indigo-600" />
+              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 md:mb-4 md:h-12 md:w-12">
+                  <Users className="h-5 w-5 text-indigo-600 md:h-6 md:w-6" />
                 </div>
-                <h3 className="mb-2 text-xl font-bold">Cộng đồng chất lượng</h3>
-                <p className="text-gray-600">Hỏi đáp nhanh, trao đổi thực tế, và networking cùng người cùng mục tiêu.</p>
-                <p className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-indigo-600">
-                  <MessageSquare className="h-4 w-4" /> {members.toLocaleString()}+ thành viên
+                <h3 className="mb-1.5 text-lg font-bold md:mb-2 md:text-xl">Cộng đồng chất lượng</h3>
+                <p className="text-sm text-gray-600 md:text-base">Hỏi đáp nhanh, trao đổi thực tế, và networking cùng người cùng mục tiêu.</p>
+                <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 md:mt-3 md:text-sm">
+                  <MessageSquare className="h-3.5 w-3.5 md:h-4 md:w-4" /> {members.toLocaleString()}+ thành viên
                 </p>
               </motion.article>
 
-              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50">
-                  <BookOpen className="h-6 w-6 text-cyan-700" />
+              <motion.article initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-6">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-50 md:mb-4 md:h-12 md:w-12">
+                  <BookOpen className="h-5 w-5 text-cyan-700 md:h-6 md:w-6" />
                 </div>
-                <h3 className="mb-2 text-xl font-bold">Khóa học có lộ trình</h3>
-                <p className="text-gray-600">Nội dung từ cơ bản đến nâng cao, học xong áp dụng được ngay.</p>
-                <p className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-cyan-700">
-                  <BookOpen className="h-4 w-4" /> {courses}+ khóa học
+                <h3 className="mb-1.5 text-lg font-bold md:mb-2 md:text-xl">Khóa học có lộ trình</h3>
+                <p className="text-sm text-gray-600 md:text-base">Nội dung từ cơ bản đến nâng cao, học xong áp dụng được ngay.</p>
+                <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-cyan-700 md:mt-3 md:text-sm">
+                  <BookOpen className="h-3.5 w-3.5 md:h-4 md:w-4" /> {courses}+ khóa học
                 </p>
               </motion.article>
             </div>
           </div>
         </section>
 
-        <section className="py-16 md:py-20">
+        <section className="py-12 md:py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, margin: '-60px' }}
               variants={fadeInUp}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1877f2] to-[#0ea5e9] p-10 text-center text-white md:p-14"
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1877f2] to-[#0ea5e9] p-8 text-center text-white md:rounded-3xl md:p-14"
             >
-              <div className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-white/15" />
-              <div className="absolute -bottom-20 -left-14 h-44 w-44 rounded-full bg-white/10" />
+              <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-white/15 md:-right-14 md:-top-14 md:h-44 md:w-44" />
+              <div className="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10 md:-bottom-20 md:-left-14 md:h-44 md:w-44" />
               <div className="relative">
-                <h2 className="mb-3 text-3xl font-extrabold md:text-4xl">Bắt đầu miễn phí ngay hôm nay</h2>
-                <p className="mx-auto mb-8 max-w-xl text-blue-100">
+                <h2 className="mb-2 text-2xl font-extrabold tracking-tight sm:text-3xl md:mb-3 md:text-4xl">Bắt đầu miễn phí ngay hôm nay</h2>
+                <p className="mx-auto mb-6 max-w-md text-sm text-blue-100 md:mb-8 md:max-w-xl md:text-base">
                   Vào cộng đồng, học nhanh từ ví dụ thực tế, và áp dụng AI ngay trong tuần này.
                 </p>
                 <Link
                   href="/auth/register"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-3.5 text-lg font-bold text-[#1877f2] transition-all hover:bg-blue-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-base font-bold text-[#1877f2] shadow-lg transition-all hover:bg-blue-50 md:rounded-2xl md:px-8 md:py-3.5 md:text-lg"
                 >
                   Đăng ký miễn phí
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
                 </Link>
               </div>
             </motion.div>
